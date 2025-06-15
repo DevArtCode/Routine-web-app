@@ -888,11 +888,8 @@
                             ? `<button class="btn btn-danger btn-sm stop-session-btn" data-title="${session.title}">Arrêter</button>
                                <button class="btn btn-success btn-sm complete-session-btn" data-title="${session.title}">Terminer</button>`
                             : isStarted
-                                ? `
-                                    <button class="btn btn-warning btn-sm resume-session-btn" data-title="${session.title}">Reprendre</button>
-                                    <button class="btn btn-success btn-sm complete-session-btn" data-title="${session.title}">Terminer</button>
-                                    <button class="btn btn-warning btn-sm reset-session-btn" data-title="${session.title}">Reset</button>
-                                  `
+                                ? `<button class="btn btn-warning btn-sm resume-session-btn" data-title="${session.title}">Reprendre</button>
+                                   <button class="btn btn-warning btn-sm reset-session-btn" data-title="${session.title}">Reset</button>`
                                 : `<button class="btn btn-primary btn-sm start-session-btn" data-title="${session.title}">Commencer</button>`
                 }
             </div>
