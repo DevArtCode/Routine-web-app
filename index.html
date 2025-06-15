@@ -724,13 +724,10 @@
                         ? `<button class="btn btn-success btn-sm" disabled>Terminé</button>`
                         : timerRunning
                             ? `<button class="btn btn-danger btn-sm stop-btn" data-id="${habit.id}">Arrêter</button>
-                               <button class="btn btn-warning btn-sm reset-timer-btn" data-id="${habit.id}">Reset</button>`
+                               <button class="btn btn-success btn-sm complete-btn" data-id="${habit.id}">Terminer</button>`
                             : isStarted
-                                ? `
-                                    <button class="btn btn-warning btn-sm resume-btn" data-id="${habit.id}">Reprendre</button>
-                                    <button class="btn btn-success btn-sm complete-btn" data-id="${habit.id}">Terminer</button>
-                                    <button class="btn btn-warning btn-sm reset-timer-btn" data-id="${habit.id}">Reset</button>
-                                  `
+                                ? `<button class="btn btn-warning btn-sm resume-btn" data-id="${habit.id}">Reprendre</button>
+                                   <button class="btn btn-warning btn-sm reset-timer-btn" data-id="${habit.id}">Reset</button>`
                                 : `<button class="btn btn-primary btn-sm start-btn" data-id="${habit.id}">Commencer</button>`
                 }
             </div>
@@ -889,7 +886,7 @@
                         ? `<button class="btn btn-success btn-sm" disabled>Terminé</button>`
                         : timerRunning
                             ? `<button class="btn btn-danger btn-sm stop-session-btn" data-title="${session.title}">Arrêter</button>
-                               <button class="btn btn-warning btn-sm reset-session-btn" data-title="${session.title}">Reset</button>`
+                               <button class="btn btn-success btn-sm complete-session-btn" data-title="${session.title}">Terminer</button>`
                             : isStarted
                                 ? `
                                     <button class="btn btn-warning btn-sm resume-session-btn" data-title="${session.title}">Reprendre</button>
