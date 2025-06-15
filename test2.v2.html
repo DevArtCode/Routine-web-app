@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker - Arthur</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #166088;
+            --accent: #4fc3f7;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+        
+        .date-display {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            font-weight: 500;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .date-nav {
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: rgba(255,255,255,0.2);
+            transition: all 0.3s;
+        }
+        
+        .date-nav:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #eee;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .habit-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .habit-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            color: var(--secondary);
+        }
+        
+        .habit-time {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .habit-progress {
+            height: 5px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--accent);
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .habit-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .timer-display {
+            font-family: monospace;
+            font-size: 1.2rem;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+        
+        .stats-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--secondary);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 15px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .calendar-day:hover {
+            background-color: #e9ecef;
+        }
+        
+        .calendar-day.active {
+            background-color: var(--primary);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .calendar-day.today {
+            border: 2px solid var(--accent);
+        }
+        
+        .calendar-day.completed {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 5px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--secondary);
+        }
+        
+        .notes-container {
+            margin-top: 20px;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .save-btn {
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        .add-habit-form {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .tab {
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .date-display {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Habit Tracker</h1>
+            <div class="date-display">
+                <span class="date-nav" id="prev-day">◀</span>
+                <span id="current-date">Lundi 15 juin 2025</span>
+                <span class="date-nav" id="next-day">▶</span>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" data-tab="habits">Routines</button>
+            <button class="tab" data-tab="calendar">Calendrier</button>
+            <button class="tab" data-tab="stats">Statistiques</button>
+            <button class="tab" data-tab="plan">Plan Global</button>
+        </div>
+        
+        <div id="habits" class="tab-content active">
+            <!-- Ajout du bouton reset dans la section stats du jour -->
+            <div class="stats-container">
+                <div class="stats-title">Progrès du Jour</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="completed-count">0</div>
+                        <div class="stat-label">Terminé</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-count">0</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="completion-rate">0%</div>
+                        <div class="stat-label">Taux</div>
+                    </div>
+                </div>
+                <button class="btn btn-danger btn-sm" id="reset-all-btn" style="margin-top:10px;float:right;">Reset tout</button>
+            </div>
+            
+            <div class="add-habit-form">
+                <h3>Ajouter un Objectif</h3>
+                <div class="form-group">
+                    <label for="new-habit-title">Titre</label>
+                    <input type="text" id="new-habit-title" placeholder="Ex: Méditation">
+                </div>
+                <div class="form-group">
+                    <label for="new-habit-duration">Durée (minutes)</label>
+                    <input type="number" id="new-habit-duration" min="1" value="15">
+                </div>
+                <div class="form-group">
+                    <label for="new-habit-type">Type</label>
+                    <select id="new-habit-type">
+                        <option value="daily">Quotidien</option>
+                        <option value="session">Session spécifique</option>
+                    </select>
+                </div>
+                <div class="form-group" id="session-date-group" style="display: none;">
+                    <label for="new-session-date">Date</label>
+                    <input type="date" id="new-session-date">
+                </div>
+                <div class="form-group" id="session-desc-group" style="display: none;">
+                    <label for="new-session-desc">Description</label>
+                    <textarea id="new-session-desc" placeholder="Détails de la session"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-danger" id="cancel-add-habit">Annuler</button>
+                    <button class="btn btn-success" id="save-new-habit">Ajouter</button>
+                </div>
+            </div>
+            
+            <h2>Routines Quotidiennes</h2>
+            <div id="daily-habits-container">
+                <!-- Les routines quotidiennes seront ajoutées ici par JavaScript -->
+            </div>
+            
+            <h2>Sessions Spécifiques</h2>
+            <div id="specific-sessions-container">
+                <!-- Les sessions spécifiques seront ajoutées ici par JavaScript -->
+            </div>
+            
+            <div class="notes-container">
+                <h3>Notes du Jour</h3>
+                <textarea id="daily-notes" placeholder="Ajoutez vos notes et réflexions ici..."></textarea>
+                <button class="btn btn-primary save-btn" id="save-notes">Enregistrer les Notes</button>
+            </div>
+        </div>
+        
+        <div id="calendar" class="tab-content">
+            <div class="stats-container">
+                <div class="stats-title">Progrès Mensuel</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="month-completed">0</div>
+                        <div class="stat-label">Jours complets</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="month-percentage">0%</div>
+                        <div class="stat-label">Taux</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="current-streak">0</div>
+                        <div class="stat-label">Série actuelle</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="calendar-header">
+                <div>Lun</div>
+                <div>Mar</div>
+                <div>Mer</div>
+                <div>Jeu</div>
+                <div>Ven</div>
+                <div>Sam</div>
+                <div>Dim</div>
+            </div>
+            <div class="calendar" id="calendar-grid">
+                <!-- Le calendrier sera généré par JavaScript -->
+            </div>
+            
+            <h3 style="margin-top: 20px;">Historique des Habitudes</h3>
+            <div id="history-container">
+                <!-- L'historique sera ajouté ici par JavaScript -->
+            </div>
+        </div>
+        
+        <div id="stats" class="tab-content">
+            <div class="stats-container">
+                <div class="stats-title">Statistiques Globales</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-days">0</div>
+                        <div class="stat-label">Jours suivis</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-completed">0</div>
+                        <div class="stat-label">Habits complétés</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="avg-completion">0%</div>
+                        <div class="stat-label">Moyenne</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Performance par Habitude</h3>
+            <div id="habits-stats-container">
+                <!-- Les statistiques par habitude seront ajoutées ici par JavaScript -->
+            </div>
+            
+            <h3>Évolution dans le Temps</h3>
+            <div style="background-color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <canvas id="progress-chart"></canvas>
+            </div>
+        </div>
+        
+        <div id="plan" class="tab-content">
+            <h2>Plan Global</h2>
+            <div id="plan-container">
+                <!-- Le plan global sera ajouté ici par JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Données de l'application
+        const appData = {
+            habits: [],
+            sessions: [],
+            completed: {},
+            notes: {},
+            timers: {},
+            settings: {
+                currentDate: new Date(),
+                firstDayOfWeek: 1 // Lundi
+            }
+        };
+        
+        // Initialisation des données
+        function initData() {
+            // Routines quotidiennes
+            appData.habits = [
+                { id: 'duolingo', title: 'Duolingo Latin', duration: 15, category: 'quotidien' },
+                { id: 'mimo', title: 'Mimo développement web', duration: 5, category: 'quotidien' },
+                { id: 'lecture-voix-haute', title: 'Lecture à voix haute', duration: 10, category: 'quotidien' },
+                { id: 'redaction-philo', title: 'Rédaction philo', duration: 20, category: 'quotidien' },
+                { id: 'marche', title: 'Marche', duration: 30, category: 'quotidien' },
+                { id: 'lecture-perso', title: 'Lecture développement personnel', duration: 15, category: 'quotidien' },
+                { id: 'culture-juridique', title: 'Culture juridique', duration: 10, category: 'quotidien' },
+                { id: 'sport', title: 'Sport maintien musculaire', duration: 15, category: 'quotidien' }
+            ];
+            
+            // Sessions spécifiques (exemple pour la première semaine)
+            appData.sessions = [
+                // Semaine 1
+                { date: '2025-06-15', title: 'Philosophie - Lecture approfondie', duration: 90, description: 'Lecture texte (Descartes, Platon, Kant), analyse, prise de notes, rédaction résumé critique de 300 mots.' },
+                { date: '2025-06-15', title: 'Mimo web - Révision HTML/CSS', duration: 90, description: 'Exercices complets, début mini-projet page web statique (texte, image, lien) codé sur éditeur.' },
+                { date: '2025-06-16', title: 'Lecture développement personnel', duration: 60, description: '7-10 pages, surlignage, résumé écrit, réflexion application pratique.' },
+                { date: '2025-06-16', title: 'Expression orale', duration: 90, description: 'Lecture à voix haute travaillée, enregistrement, préparation texte oral court (ex. introduction philo), répétitions devant miroir ou vidéo.' },
+                { date: '2025-06-16', title: 'Latin intensif Duolingo', duration: 60, description: 'Exercices ciblés, correction erreurs, traduction 5 phrases manuelles.' },
+                { date: '2025-06-17', title: 'Philosophie - Rédaction', duration: 90, description: '30 lignes argumentées, relecture et correction cohérence/style.' },
+                { date: '2025-06-17', title: 'Mimo JavaScript', duration: 90, description: 'Bases variables, fonctions, conditions, exercices, intégration JS simple dans mini-projet (bouton change couleur texte).' },
+                { date: '2025-06-18', title: 'Culture juridique', duration: 90, description: 'Étude d\'une loi/principe, analyse implications, exemples concrets.' },
+                { date: '2025-06-18', title: 'Expression orale', duration: 90, description: 'Répétition lecture à voix haute, questions/réponses simulées, confiance à l\'oral.' },
+                { date: '2025-06-19', title: 'Philosophie - Rédaction', duration: 120, description: '30 lignes, préparation plan oral détaillé, entraînement oral avec enregistrement.' },
+                { date: '2025-06-19', title: 'Développement web', duration: 60, description: 'Finalisation intégration HTML, CSS, JS du mini-projet, tests et corrections bugs.' },
+                { date: '2025-06-20', title: 'Latin - Traduction', duration: 90, description: 'Traduction texte court, étude déclinaisons complexes, quiz vocabulaire.' },
+                { date: '2025-06-20', title: 'Lecture développement personnel', duration: 90, description: '10 pages, synthèse écrite 10 lignes, réflexion personnelle.' },
+                { date: '2025-06-21', title: 'Philosophie - Révision', duration: 180, description: 'Révision complète notes semaine, quiz concepts, préparation plan oral 10 minutes.' },
+                
+                // Semaine 2
+                { date: '2025-06-22', title: 'Philosophie - Lecture lente', duration: 90, description: 'Lecture texte difficile, prise notes, résumé écrit, préparation présentation orale 5 min.' },
+                { date: '2025-06-22', title: 'Mimo JavaScript avancé', duration: 90, description: 'Boucles, conditions complexes, exercices, amélioration mini-projet.' },
+                { date: '2025-06-23', title: 'Philosophie - Rédaction', duration: 90, description: 'Rédaction complète texte sur nouveau sujet, entraînement oral.' },
+                { date: '2025-06-23', title: 'Latin - Exercices', duration: 60, description: 'Exercices ciblés, révisions.' },
+                { date: '2025-06-24', title: 'Culture juridique', duration: 90, description: 'Lecture, prise de notes approfondie.' },
+                { date: '2025-06-24', title: 'Expression orale', duration: 90, description: 'Travail intonation, rythme, répétitions.' },
+                { date: '2025-06-25', title: 'Simulation d\'oral complet', duration: 180, description: 'Préparation, présentation, enregistrement, analyse détaillée.' },
+                { date: '2025-06-26', title: 'Développement web', duration: 90, description: 'Finalisation projet complet.' },
+                { date: '2025-06-26', title: 'Philosophie - Synthèse', duration: 90, description: 'Synthèse des connaissances, exercices pratiques.' },
+                { date: '2025-06-27', title: 'Révisions générales', duration: 180, description: 'Révisions ciblées - philo, latin, code, travail sur points faibles identifiés.' },
+                { date: '2025-06-28', title: 'Lecture développement personnel', duration: 120, description: 'Synthèse écrite + temps calme / relaxation.' },
+                
+                // Derniers jours
+                { date: '2025-06-29', title: 'Simulation orale finale', duration: 180, description: 'Présentation complète, corrections, auto-évaluation.' },
+                { date: '2025-06-30', title: 'Révisions ciblées', duration: 180, description: 'Répétitions orales intenses, préparation mentale.' },
+                { date: '2025-07-01', title: 'Routines allégées', duration: 60, description: 'Lecture courte, relaxation, préparation mentale légère avant l\'oral.' }
+            ];
+            
+            // Charger les données depuis le stockage local
+            loadData();
+            
+            // Si aucune donnée, initialiser pour la date actuelle
+            const todayStr = formatDate(appData.settings.currentDate);
+            if (!appData.completed[todayStr]) {
+                appData.completed[todayStr] = {};
+            }
+            if (!appData.notes[todayStr]) {
+                appData.notes[todayStr] = '';
+            }
+        }
+        
+        // Fonctions utilitaires
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        function parseDate(dateStr) {
+            const parts = dateStr.split('-');
+            return new Date(parts[0], parts[1] - 1, parts[2]);
+        }
+        
+        function formatDisplayDate(date) {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('fr-FR', options);
+        }
+        
+        function getDayName(date, short = false) {
+            const options = { weekday: short ? 'short' : 'long' };
+            return date.toLocaleDateString('fr-FR', options);
+        }
+        
+        // Gestion du stockage local
+        function saveData() {
+            localStorage.setItem('habitTrackerData', JSON.stringify(appData));
+        }
+        
+        function loadData() {
+            const savedData = localStorage.getItem('habitTrackerData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                Object.assign(appData, parsedData);
+                
+                // Convertir les dates strings en objets Date
+                appData.settings.currentDate = new Date(appData.settings.currentDate);
+                
+                // Convertir les dates dans les sessions
+                appData.sessions.forEach(session => {
+                    if (typeof session.date === 'string') {
+                        session.dateObj = parseDate(session.date);
+                    }
+                });
+            }
+        }
+        
+        // Gestion de l'interface
+        function updateUI() {
+            updateDateDisplay();
+            renderDailyHabits();
+            renderSpecificSessions();
+            updateStats();
+            renderCalendar();
+            renderHistory();
+            renderHabitsStats();
+            renderPlan();
+            loadNotes();
+        }
+        
+        function updateDateDisplay() {
+            document.getElementById('current-date').textContent = formatDisplayDate(appData.settings.currentDate);
+        }
+        
+        function renderDailyHabits() {
+            const container = document.getElementById('daily-habits-container');
+            container.innerHTML = '';
+
+            const todayStr = formatDate(appData.settings.currentDate);
+            const todayCompleted = appData.completed[todayStr] || {};
+
+    appData.habits.forEach(habit => {
+        const isCompleted = todayCompleted[habit.id] === true;
+        const isStarted = todayCompleted[habit.id] === 'started';
+        const timer = appData.timers[habit.id];
+        const timerRunning = timer && timer.running;
+        const totalTime = habit.duration * 60;
+        const remainingTime = timer ? timer.remaining : totalTime;
+
+        const minutes = Math.floor(remainingTime / 60);
+        const seconds = remainingTime % 60;
+
+        // Calcul du pourcentage de progression réel
+        let progressPercent = 0;
+        if (isCompleted) {
+            progressPercent = 100;
+        } else if (isStarted) {
+            progressPercent = Math.round(100 * (1 - remainingTime / totalTime));
+            if (progressPercent < 0) progressPercent = 0;
+            if (progressPercent > 100) progressPercent = 100;
+        }
+
+        // Déterminer si c'est une habitude "de base" (protégée)
+        const isDefault = [
+            'duolingo','mimo','lecture-voix-haute','redaction-philo','marche','lecture-perso','culture-juridique','sport'
+        ].includes(habit.id);
+
+        const habitEl = document.createElement('div');
+        habitEl.className = 'habit-card';
+        habitEl.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div class="habit-title">${habit.title}</div>
+                ${!isDefault ? `<button class="btn btn-danger btn-sm delete-habit-btn" data-id="${habit.id}" title="Supprimer"><span style="pointer-events:none;">🗑️</span></button>` : ''}
+            </div>
+            <div class="habit-time">Durée: ${habit.duration} minutes</div>
+            <div class="habit-progress">
+                <div class="progress-bar"
+                    style="width: ${progressPercent}%; cursor:pointer; background-color: var(--accent); height: 100%; transition: width 0.5s;"
+                    data-id="${habit.id}"
+                    data-total="${totalTime}"
+                    data-remaining="${remainingTime}">
+                </div>
+            </div>
+            <div class="habit-actions">
+                <div class="timer-display">${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}</div>
+                ${
+                    isCompleted
+                        ? `<button class="btn btn-success btn-sm" disabled>Terminé</button>`
+                        : timerRunning
+                            ? `<button class="btn btn-danger btn-sm stop-btn" data-id="${habit.id}">Arrêter</button>
+                               <button class="btn btn-warning btn-sm reset-timer-btn" data-id="${habit.id}">Reset</button>`
+                            : isStarted
+                                ? `
+                                    <button class="btn btn-warning btn-sm resume-btn" data-id="${habit.id}">Reprendre</button>
+                                    <button class="btn btn-success btn-sm complete-btn" data-id="${habit.id}">Terminer</button>
+                                    <button class="btn btn-warning btn-sm reset-timer-btn" data-id="${habit.id}">Reset</button>
+                                  `
+                                : `<button class="btn btn-primary btn-sm start-btn" data-id="${habit.id}">Commencer</button>`
+                }
+            </div>
+        `;
+        container.appendChild(habitEl);
+    }); // <-- Ajouté la parenthèse et la virgule manquantes ici
+
+    // Ajouter les écouteurs d'événements
+    document.querySelectorAll('.start-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            startHabit(this.dataset.id);
+        });
+    });
+    
+    document.querySelectorAll('.resume-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            startTimer(this.dataset.id);
+        });
+    });
+    
+    document.querySelectorAll('.stop-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            stopTimer(this.dataset.id);
+        });
+    });
+    
+    document.querySelectorAll('.complete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            completeHabit(this.dataset.id);
+        });
+    });
+    
+    // Suppression d'une habitude utilisateur
+    document.querySelectorAll('.delete-habit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (confirm('Supprimer cette habitude ?')) {
+                const id = this.dataset.id;
+                // Supprimer l'habitude
+                appData.habits = appData.habits.filter(h => h.id !== id);
+                // Supprimer les statuts associés dans completed et timers
+                Object.keys(appData.completed).forEach(dateStr => {
+                    if (appData.completed[dateStr][id] !== undefined) {
+                        delete appData.completed[dateStr][id];
+                    }
+                });
+                if (appData.timers[id]) delete appData.timers[id];
+                saveData();
+                updateUI();
+            }
+        });
+    }); // <-- Ajouté la parenthèse et la virgule manquantes ici
+
+    // Barre de progression interactive pour changer le temps restant
+    container.querySelectorAll('.progress-bar').forEach(bar => {
+        function setTimeFromEvent(e) {
+            e.preventDefault();
+            let clientX;
+            if (e.touches && e.touches.length) {
+                clientX = e.touches[0].clientX;
+            } else if (e.clientX !== undefined) {
+                clientX = e.clientX;
+            } else if (e.pointerType) {
+                clientX = e.clientX;
+            }
+            const rect = bar.getBoundingClientRect();
+            const percent = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
+            const total = parseInt(bar.dataset.total);
+            const newRemaining = Math.round(total * (1 - percent));
+            const id = bar.dataset.id;
+            if (!appData.timers[id]) appData.timers[id] = {};
+            appData.timers[id].remaining = newRemaining;
+            appData.timers[id].running = false;
+            saveData();
+            renderDailyHabits();
+        }
+        bar.addEventListener('pointerdown', setTimeFromEvent);
+        bar.addEventListener('touchstart', setTimeFromEvent, {passive: false});
+    });
+
+    // Reset individuel du timer
+    container.querySelectorAll('.reset-timer-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            if (appData.timers[id]) {
+                clearInterval(appData.timers[id].interval);
+                delete appData.timers[id];
+            }
+            // Réinitialiser l'état : supprimer le statut dans completed pour ce jour et cette habitude
+            const todayStr = formatDate(appData.settings.currentDate);
+            if (appData.completed[todayStr] && appData.completed[todayStr][id] !== undefined) {
+                delete appData.completed[todayStr][id];
+            }
+            saveData();
+            renderDailyHabits();
+        });
+    });
+
+    // Mettre à jour les compteurs
+    updateDayCounters();
+}
+        
+        function renderSpecificSessions() {
+    const container = document.getElementById('specific-sessions-container');
+    container.innerHTML = '';
+
+    const todayStr = formatDate(appData.settings.currentDate);
+    const todaySessions = appData.sessions.filter(session => session.date === todayStr);
+    const todayCompleted = appData.completed[todayStr] || {};
+
+    if (todaySessions.length === 0) {
+        container.innerHTML = '<p>Aucune session spécifique prévue pour aujourd\'hui.</p>';
+        return;
+    }
+
+    todaySessions.forEach(session => {
+        const isCompleted = todayCompleted[`session-${session.title}`] === true;
+        const isStarted = todayCompleted[`session-${session.title}`] === 'started';
+        const timerRunning = appData.timers[`session-${session.title}`] && appData.timers[`session-${session.title}`].running;
+        const totalTime = session.duration * 60;
+        const remainingTime = timerRunning ? appData.timers[`session-${session.title}`].remaining : totalTime;
+
+        const hours = Math.floor(remainingTime / 3600);
+        const minutes = Math.floor((remainingTime % 3600) / 60);
+        const seconds = remainingTime % 60;
+
+        let progressPercent = 0;
+        if (isCompleted) {
+            progressPercent = 100;
+        } else if (isStarted) {
+            progressPercent = Math.round(100 * (1 - remainingTime / totalTime));
+            if (progressPercent < 0) progressPercent = 0;
+            if (progressPercent > 100) progressPercent = 100;
+        }
+
+        const sessionEl = document.createElement('div');
+        sessionEl.className = 'habit-card';
+        sessionEl.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div class="habit-title">${session.title}</div>
+                <button class="btn btn-danger btn-sm delete-session-btn" data-title="${session.title}" data-date="${session.date}" title="Supprimer"><span style="pointer-events:none;">🗑️</span></button>
+            </div>
+            <div class="habit-time">Durée: ${Math.floor(session.duration / 60)}h${session.duration % 60 !== 0 ? String(session.duration % 60).padStart(2, '0') : '00'}</div>
+            <div class="habit-description" style="margin-bottom: 10px; font-size: 0.9rem; color: #555;">${session.description}</div>
+            <div class="habit-progress">
+                <div class="progress-bar"
+                    style="width: ${progressPercent}%; cursor:pointer; background-color: var(--accent); height: 100%; transition: width 0.5s;"
+                    data-title="${session.title}"
+                    data-total="${totalTime}"
+                    data-remaining="${remainingTime}">
+                </div>
+            </div>
+            <div class="habit-actions">
+                <div class="timer-display">${hours > 0 ? `${hours}:` : ''}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}</div>
+                ${
+                    isCompleted
+                        ? `<button class="btn btn-success btn-sm" disabled>Terminé</button>`
+                        : timerRunning
+                            ? `<button class="btn btn-danger btn-sm stop-session-btn" data-title="${session.title}">Arrêter</button>
+                               <button class="btn btn-warning btn-sm reset-session-btn" data-title="${session.title}">Reset</button>`
+                            : isStarted
+                                ? `
+                                    <button class="btn btn-warning btn-sm resume-session-btn" data-title="${session.title}">Reprendre</button>
+                                    <button class="btn btn-success btn-sm complete-session-btn" data-title="${session.title}">Terminer</button>
+                                    <button class="btn btn-warning btn-sm reset-session-btn" data-title="${session.title}">Reset</button>
+                                  `
+                                : `<button class="btn btn-primary btn-sm start-session-btn" data-title="${session.title}">Commencer</button>`
+                }
+            </div>
+        `;
+        container.appendChild(sessionEl);
+    });
+    
+    // Ajouter les écouteurs d'événements
+    document.querySelectorAll('.start-session-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            startSession(this.dataset.title);
+        });
+    });
+    
+    document.querySelectorAll('.resume-session-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            startSessionTimer(this.dataset.title);
+        });
+    });
+    
+    document.querySelectorAll('.stop-session-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            stopSessionTimer(this.dataset.title);
+        });
+    });
+    
+    document.querySelectorAll('.complete-session-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            completeSession(this.dataset.title);
+        });
+    });
+    
+    // Suppression d'une session spécifique
+    document.querySelectorAll('.delete-session-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (confirm('Supprimer cette session spécifique ?')) {
+                const title = this.dataset.title;
+                const date = this.dataset.date;
+                // Supprimer la session
+                appData.sessions = appData.sessions.filter(s => !(s.title === title && s.date === date));
+                // Supprimer les statuts associés dans completed et timers
+                Object.keys(appData.completed).forEach(dateStr => {
+                    const key = `session-${title}`;
+                    if (appData.completed[dateStr][key] !== undefined) {
+                        delete appData.completed[dateStr][key];
+                    }
+                });
+                if (appData.timers[`session-${title}`]) delete appData.timers[`session-${title}`];
+                saveData();
+                updateUI();
+            }
+        });
+    });
+    
+    // Barre de progression interactive pour changer le temps restant (sessions)
+    container.querySelectorAll('.progress-bar').forEach(bar => {
+        function setTimeFromEvent(e) {
+            e.preventDefault();
+            let clientX;
+            if (e.touches && e.touches.length) {
+                clientX = e.touches[0].clientX;
+            } else if (e.clientX !== undefined) {
+                clientX = e.clientX;
+            } else if (e.pointerType) {
+                clientX = e.clientX;
+            }
+            const rect = bar.getBoundingClientRect();
+            const percent = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
+            const total = parseInt(bar.dataset.total);
+            const newRemaining = Math.round(total * (1 - percent));
+            const title = bar.dataset.title;
+            const timerKey = `session-${title}`;
+            if (!appData.timers[timerKey]) appData.timers[timerKey] = {};
+            appData.timers[timerKey].remaining = newRemaining;
+            appData.timers[timerKey].running = false;
+            saveData();
+            renderSpecificSessions();
+        }
+        bar.addEventListener('pointerdown', setTimeFromEvent);
+        bar.addEventListener('touchstart', setTimeFromEvent, {passive: false});
+    });
+
+    // Reset individuel du timer pour sessions
+    container.querySelectorAll('.reset-session-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const title = this.dataset.title;
+            const timerKey = `session-${title}`;
+            if (appData.timers[timerKey]) {
+                clearInterval(appData.timers[timerKey].interval);
+                delete appData.timers[timerKey];
+            }
+            // Réinitialiser l'état : supprimer le statut dans completed pour ce jour et cette session
+            const todayStr = formatDate(appData.settings.currentDate);
+            if (appData.completed[todayStr] && appData.completed[todayStr][timerKey] !== undefined) {
+                delete appData.completed[todayStr][timerKey];
+            }
+            saveData();
+            renderSpecificSessions();
+        });
+    });
+}
+        
+        function startHabit(habitId) {
+            const todayStr = formatDate(appData.settings.currentDate);
+            if (!appData.completed[todayStr]) {
+                appData.completed[todayStr] = {};
+            }
+            appData.completed[todayStr][habitId] = 'started';
+            saveData();
+            
+            // Démarrer le minuteur
+            startTimer(habitId);
+        }
+        
+        function startTimer(habitId) {
+            const habit = appData.habits.find(h => h.id === habitId);
+            if (!habit) return;
+            
+            // Arrêter tout minuteur existant
+            if (appData.timers[habitId]) {
+                clearInterval(appData.timers[habitId].interval);
+            }
+            
+            // Initialiser le minuteur
+            const duration = habit.duration * 60;
+            let remainingTime = duration;
+            
+            if (appData.timers[habitId] && appData.timers[habitId].remaining) {
+                remainingTime = appData.timers[habitId].remaining;
+            }
+            
+            appData.timers[habitId] = {
+                running: true,
+                remaining: remainingTime,
+                interval: setInterval(() => {
+                    appData.timers[habitId].remaining--;
+                    
+                    if (appData.timers[habitId].remaining <= 0) {
+                        clearInterval(appData.timers[habitId].interval);
+                        completeHabit(habitId);
+                    }
+                    
+                    // Mettre à jour l'affichage
+                    renderDailyHabits();
+                }, 1000)
+            };
+            
+            renderDailyHabits();
+        }
+        
+        function stopTimer(habitId) {
+            if (appData.timers[habitId]) {
+                clearInterval(appData.timers[habitId].interval);
+                appData.timers[habitId].running = false;
+                saveData();
+                renderDailyHabits();
+            }
+        }
+        
+        function completeHabit(habitId) {
+            const todayStr = formatDate(appData.settings.currentDate);
+            if (!appData.completed[todayStr]) {
+                appData.completed[todayStr] = {};
+            }
+            appData.completed[todayStr][habitId] = true;
+            
+            // Arrêter le minuteur
+            if (appData.timers[habitId]) {
+                clearInterval(appData.timers[habitId].interval);
+                delete appData.timers[habitId];
+            }
+            
+            saveData();
+            renderDailyHabits();
+        }
+        
+        function startSession(sessionTitle) {
+            const todayStr = formatDate(appData.settings.currentDate);
+            if (!appData.completed[todayStr]) {
+                appData.completed[todayStr] = {};
+            }
+            appData.completed[todayStr][`session-${sessionTitle}`] = 'started';
+            saveData();
+            
+            // Démarrer le minuteur
+            startSessionTimer(sessionTitle);
+        }
+        
+        function startSessionTimer(sessionTitle) {
+            const session = appData.sessions.find(s => s.title === sessionTitle && s.date === formatDate(appData.settings.currentDate));
+            if (!session) return;
+            
+            // Arrêter tout minuteur existant
+            if (appData.timers[`session-${sessionTitle}`]) {
+                clearInterval(appData.timers[`session-${sessionTitle}`].interval);
+            }
+            
+            // Initialiser le minuteur
+            const duration = session.duration * 60;
+            let remainingTime = duration;
+            
+            if (appData.timers[`session-${sessionTitle}`] && appData.timers[`session-${sessionTitle}`].remaining) {
+                remainingTime = appData.timers[`session-${sessionTitle}`].remaining;
+            }
+            
+            appData.timers[`session-${sessionTitle}`] = {
+                running: true,
+                remaining: remainingTime,
+                interval: setInterval(() => {
+                    appData.timers[`session-${sessionTitle}`].remaining--;
+                    
+                    if (appData.timers[`session-${sessionTitle}`].remaining <= 0) {
+                        clearInterval(appData.timers[`session-${sessionTitle}`].interval);
+                        completeSession(sessionTitle);
+                    }
+                    
+                    // Mettre à jour l'affichage
+                    renderSpecificSessions();
+                }, 1000)
+            };
+            
+            renderSpecificSessions();
+        }
+        
+        function stopSessionTimer(sessionTitle) {
+            if (appData.timers[`session-${sessionTitle}`]) {
+                clearInterval(appData.timers[`session-${sessionTitle}`].interval);
+                appData.timers[`session-${sessionTitle}`].running = false;
+                saveData();
+                renderSpecificSessions();
+            }
+        }
+        
+        function completeSession(sessionTitle) {
+            const todayStr = formatDate(appData.settings.currentDate);
+            if (!appData.completed[todayStr]) {
+                appData.completed[todayStr] = {};
+            }
+            appData.completed[todayStr][`session-${sessionTitle}`] = true;
+            
+            // Arrêter le minuteur
+            if (appData.timers[`session-${sessionTitle}`]) {
+                clearInterval(appData.timers[`session-${sessionTitle}`].interval);
+                delete appData.timers[`session-${sessionTitle}`];
+            }
+            
+            saveData();
+            renderSpecificSessions();
+        }
+        
+        function updateDayCounters() {
+            const todayStr = formatDate(appData.settings.currentDate);
+            const todayCompleted = appData.completed[todayStr] || {};
+            
+            // Compter les habitudes quotidiennes complétées
+            const dailyCompleted = appData.habits.filter(habit => todayCompleted[habit.id] === true).length;
+            
+            // Compter les sessions spécifiques complétées
+            const todaySessions = appData.sessions.filter(session => session.date === todayStr);
+            const sessionsCompleted = todaySessions.filter(session => todayCompleted[`session-${session.title}`] === true).length;
+            
+            const totalCompleted = dailyCompleted + sessionsCompleted;
+            const totalTasks = appData.habits.length + todaySessions.length;
+            const completionRate = totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0;
+            
+            document.getElementById('completed-count').textContent = totalCompleted;
+            document.getElementById('total-count').textContent = totalTasks;
+            document.getElementById('completion-rate').textContent = `${completionRate}%`;
+        }
+        
+        function renderCalendar() {
+            const container = document.getElementById('calendar-grid');
+            container.innerHTML = '';
+            
+            const currentDate = appData.settings.currentDate;
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // Premier jour du mois
+            const firstDay = new Date(year, month, 1);
+            // Dernier jour du mois
+            const lastDay = new Date(year, month + 1, 0);
+            
+            // Nombre de jours dans le mois
+            const daysInMonth = lastDay.getDate();
+            
+            // Jour de la semaine du premier jour (0=dimanche, 1=lundi, etc.)
+            let firstDayOfWeek = firstDay.getDay();
+            // Ajuster selon le premier jour de la semaine (lundi)
+            firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+            
+            // Créer les cases vides pour les jours du mois précédent
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day';
+                container.appendChild(emptyDay);
+            }
+            
+            // Créer les cases pour chaque jour du mois
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dateStr = formatDate(date);
+                const isToday = formatDate(new Date()) === dateStr;
+                const isCompleted = appData.completed[dateStr] && 
+                                    Object.values(appData.completed[dateStr]).some(val => val === true);
+                
+                const dayEl = document.createElement('div');
+                dayEl.className = `calendar-day ${isToday ? 'today' : ''} ${isCompleted ? 'completed' : ''}`;
+                dayEl.textContent = day;
+                dayEl.title = getDayName(date);
+                
+                if (date <= new Date()) {
+                    dayEl.addEventListener('click', function() {
+                        navigateToDate(date);
+                    });
+                }
+                
+                container.appendChild(dayEl);
+            }
+            
+            // Mettre à jour les statistiques mensuelles
+            updateMonthStats();
+        }
+        
+        function navigateToDate(date) {
+            appData.settings.currentDate = date;
+            saveData();
+            updateUI();
+        }
+        
+        function navigateToPrevDay() {
+            const newDate = new Date(appData.settings.currentDate);
+            newDate.setDate(newDate.getDate() - 1);
+            appData.settings.currentDate = newDate;
+            saveData();
+            updateUI();
+        }
+        
+        function navigateToNextDay() {
+            const newDate = new Date(appData.settings.currentDate);
+            newDate.setDate(newDate.getDate() + 1);
+            const now = new Date();
+            now.setHours(0,0,0,0);
+            newDate.setHours(0,0,0,0);
+            // Correction : autoriser la navigation jusqu'au jour courant inclus
+            if (newDate <= now) {
+                appData.settings.currentDate = newDate;
+                saveData();
+                updateUI();
+            }
+        }
+        
+        function updateMonthStats() {
+            const currentDate = appData.settings.currentDate;
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // Premier jour du mois
+            const firstDay = new Date(year, month, 1);
+            // Dernier jour du mois
+            const lastDay = new Date(year, month + 1, 0);
+            
+            let completedDays = 0;
+            let totalDays = 0;
+            let currentStreak = 0;
+            let maxStreak = 0;
+            
+            // Parcourir tous les jours du mois
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const date = new Date(year, month, day);
+                const dateStr = formatDate(date);
+                
+                // Ne compter que les jours passés
+                if (date <= new Date()) {
+                    totalDays++;
+                    
+                    if (appData.completed[dateStr] && Object.values(appData.completed[dateStr]).some(val => val === true)) {
+                        completedDays++;
+                        currentStreak++;
+                        if (currentStreak > maxStreak) {
+                            maxStreak = currentStreak;
+                        }
+                    } else {
+                        currentStreak = 0;
+                    }
+                }
+            }
+            
+            const completionPercentage = totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
+            
+            document.getElementById('month-completed').textContent = completedDays;
+            document.getElementById('month-percentage').textContent = `${completionPercentage}%`;
+            document.getElementById('current-streak').textContent = currentStreak;
+        }
+        
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            container.innerHTML = '';
+            
+            // Trier les dates par ordre décroissant
+            const dates = Object.keys(appData.completed).sort((a, b) => {
+                return new Date(b) - new Date(a);
+            }).slice(0, 7); // Limiter aux 7 derniers jours
+            
+            if (dates.length === 0) {
+                container.innerHTML = '<p>Aucun historique récent.</p>';
+                return;
+            }
+            
+            dates.forEach(dateStr => {
+                const date = parseDate(dateStr);
+                const completedHabits = Object.entries(appData.completed[dateStr])
+                    .filter(([_, value]) => value === true)
+                    .map(([id]) => {
+                        const habit = appData.habits.find(h => h.id === id);
+                        return habit ? habit.title : id.replace('session-', '');
+                    });
+                
+                if (completedHabits.length === 0) return;
+                
+                const historyEl = document.createElement('div');
+                historyEl.className = 'habit-card';
+                historyEl.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 5px;">${getDayName(date)} ${date.getDate()} ${date.toLocaleDateString('fr-FR', { month: 'short' })}</div>
+                    <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem;">
+                        ${completedHabits.map(habit => `<li>${habit}</li>`).join('')}
+                    </ul>
+                `;
+                
+                container.appendChild(historyEl);
+            });
+        }
+        
+        function renderHabitsStats() {
+            const container = document.getElementById('habits-stats-container');
+            container.innerHTML = '';
+            
+            // Calculer les statistiques pour chaque habitude
+            const habitStats = appData.habits.map(habit => {
+                let completedCount = 0;
+                let totalDays = 0;
+                
+                Object.entries(appData.completed).forEach(([dateStr, habits]) => {
+                    const date = parseDate(dateStr);
+                    // Ne compter que les jours passés
+                    if (date <= new Date()) {
+                        totalDays++;
+                        if (habits[habit.id] === true) {
+                            completedCount++;
+                        }
+                    }
+                });
+                
+                const completionRate = totalDays > 0 ? Math.round((completedCount / totalDays) * 100) : 0;
+                
+                return {
+                    id: habit.id,
+                    title: habit.title,
+                    completed: completedCount,
+                    total: totalDays,
+                    rate: completionRate
+                };
+            });
+            
+            // Trier par taux de complétion (décroissant)
+            habitStats.sort((a, b) => b.rate - a.rate);
+            
+            habitStats.forEach(stat => {
+                const statEl = document.createElement('div');
+                statEl.className = 'habit-card';
+                statEl.innerHTML = `
+                    <div class="habit-title">${stat.title}</div>
+                    <div class="habit-progress">
+                        <div class="progress-bar" style="width: ${stat.rate}%"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                        <span style="font-size: 0.9rem;">${stat.completed}/${stat.total} jours</span>
+                        <span style="font-weight: 600;">${stat.rate}%</span>
+                    </div>
+                `;
+                
+                container.appendChild(statEl);
+            });
+            
+            // Mettre à jour les statistiques globales
+            updateGlobalStats();
+            
+            // Mettre à jour le graphique
+            updateProgressChart();
+        }
+        
+        function updateGlobalStats() {
+            let totalDaysTracked = 0;
+            let totalHabitsCompleted = 0;
+            let totalPossibleHabits = 0;
+            
+            Object.entries(appData.completed).forEach(([dateStr, habits]) => {
+                const date = parseDate(dateStr);
+                // Ne compter que les jours passés
+                if (date <= new Date()) {
+                    totalDaysTracked++;
+                    totalHabitsCompleted += Object.values(habits).filter(val => val === true).length;
+                    totalPossibleHabits += appData.habits.length;
+                    
+                    // Ajouter les sessions spécifiques pour ce jour
+                    const dateSessions = appData.sessions.filter(session => session.date === dateStr);
+                    totalPossibleHabits += dateSessions.length;
+                    totalHabitsCompleted += dateSessions.filter(session => habits[`session-${session.title}`] === true).length;
+                }
+            });
+            
+            const avgCompletion = totalPossibleHabits > 0 ? Math.round((totalHabitsCompleted / totalPossibleHabits) * 100) : 0;
+            
+            document.getElementById('total-days').textContent = totalDaysTracked;
+            document.getElementById('total-completed').textContent = totalHabitsCompleted;
+            document.getElementById('avg-completion').textContent = `${avgCompletion}%`;
+        }
+        
+        function updateProgressChart() {
+            const ctx = document.getElementById('progress-chart').getContext('2d');
+            
+            // Trier les dates par ordre chronologique
+            const dates = Object.keys(appData.completed)
+                .filter(dateStr => parseDate(dateStr) <= new Date())
+                .sort((a, b) => new Date(a) - new Date(b));
+            
+            // Préparer les données pour le graphique
+            const labels = dates.map(dateStr => {
+                const date = parseDate(dateStr);
+                return `${date.getDate()}/${date.getMonth() + 1}`;
+            });
+            
+            const completionRates = dates.map(dateStr => {
+                const completed = Object.values(appData.completed[dateStr]).filter(val => val === true).length;
+                const dateSessions = appData.sessions.filter(session => session.date === dateStr).length;
+                const total = appData.habits.length + dateSessions;
+                return total > 0 ? Math.round((completed / total) * 100) : 0;
+            });
+            
+            // Créer ou mettre à jour le graphique
+            if (window.progressChart) {
+                window.progressChart.data.labels = labels;
+                window.progressChart.data.datasets[0].data = completionRates;
+                window.progressChart.update();
+            } else {
+                window.progressChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Taux de complétion (%)',
+                            data: completionRates,
+                            borderColor: 'rgba(79, 195, 247, 1)',
+                            backgroundColor: 'rgba(79, 195, 247, 0.2)',
+                            borderWidth: 2,
+                            tension: 0.1,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        function renderPlan() {
+            const container = document.getElementById('plan-container');
+            container.innerHTML = '';
+
+            // Grouper les sessions par semaine puis par jour (uniquement les jours où il y a des tâches)
+            const weeks = {};
+            appData.sessions.forEach(session => {
+                const date = parseDate(session.date);
+                // On clone la date pour éviter les effets de bord avec setDate
+                const weekStart = new Date(date);
+                const dayOfWeek = weekStart.getDay();
+                const diff = weekStart.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+                weekStart.setDate(diff);
+                weekStart.setHours(0,0,0,0);
+                const weekKey = formatDate(weekStart);
+
+                if (!weeks[weekKey]) {
+                    weeks[weekKey] = {
+                        startDate: new Date(weekStart),
+                        days: {}
+                    };
+                }
+
+                const dayKey = formatDate(date);
+                if (!weeks[weekKey].days[dayKey]) {
+                    weeks[weekKey].days[dayKey] = {
+                        date: new Date(date),
+                        sessions: []
+                    };
+                }
+                weeks[weekKey].days[dayKey].sessions.push(session);
+            });
+
+            // Trier les semaines par date
+            const sortedWeeks = Object.values(weeks).sort((a, b) => a.startDate - b.startDate);
+
+            // Afficher chaque semaine
+            sortedWeeks.forEach((week, weekIndex) => {
+                const weekEl = document.createElement('div');
+                weekEl.className = 'habit-card';
+
+                const weekTitle = document.createElement('div');
+                weekTitle.className = 'habit-title';
+                const weekEnd = new Date(week.startDate.getTime() + 6 * 24 * 60 * 60 * 1000);
+                weekTitle.textContent = `Semaine ${weekIndex + 1} (${week.startDate.getDate()} ${week.startDate.toLocaleDateString('fr-FR', { month: 'short' })} - ${weekEnd.getDate()} ${weekEnd.toLocaleDateString('fr-FR', { month: 'short' })})`;
+                weekEl.appendChild(weekTitle);
+
+                // Trier les jours par date et n'afficher que ceux où il y a des tâches
+                const sortedDays = Object.values(week.days).sort((a, b) => a.date - b.date);
+
+                sortedDays.forEach(day => {
+                    const dayEl = document.createElement('div');
+                    dayEl.style.marginTop = '15px';
+
+                    const dayTitle = document.createElement('div');
+                    dayTitle.style.fontWeight = '600';
+                    dayTitle.style.marginBottom = '5px';
+                    // Affichage du jour et du mois en français
+                    dayTitle.textContent = `${getDayName(day.date)} ${day.date.getDate()} ${day.date.toLocaleDateString('fr-FR', { month: 'long' })}`;
+                    dayEl.appendChild(dayTitle);
+
+                    // Afficher chaque session pour ce jour
+                    day.sessions.forEach(session => {
+                        const sessionEl = document.createElement('div');
+                        sessionEl.style.marginBottom = '10px';
+                        sessionEl.style.fontSize = '0.9rem';
+
+                        const sessionTitle = document.createElement('div');
+                        sessionTitle.style.fontWeight = '500';
+                        sessionTitle.textContent = `${session.title} (${Math.floor(session.duration / 60)}h${session.duration % 60 !== 0 ? String(session.duration % 60).padStart(2, '0') : '00'})`;
+                        sessionEl.appendChild(sessionTitle);
+
+                        const sessionDesc = document.createElement('div');
+                        sessionDesc.style.color = '#555';
+                        sessionDesc.textContent = session.description;
+                        sessionEl.appendChild(sessionDesc);
+
+                        dayEl.appendChild(sessionEl);
+                    });
+
+                    weekEl.appendChild(dayEl);
+                });
+
+                container.appendChild(weekEl);
+            });
+        }
+        
+        function loadNotes() {
+            const todayStr = formatDate(appData.settings.currentDate);
+            document.getElementById('daily-notes').value = appData.notes[todayStr] || '';
+        }
+        
+        function saveNotes() {
+            const todayStr = formatDate(appData.settings.currentDate);
+            appData.notes[todayStr] = document.getElementById('daily-notes').value;
+            saveData();
+            
+            // Afficher une notification
+            const notification = document.createElement('div');
+            notification.textContent = 'Notes enregistrées!';
+            notification.style.position = 'fixed';
+            notification.style.bottom = '20px';
+            notification.style.right = '20px';
+            notification.style.backgroundColor = 'var(--success)';
+            notification.style.color = 'white';
+            notification.style.padding = '10px 20px';
+            notification.style.borderRadius = '5px';
+            notification.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+            notification.style.zIndex = '1000';
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 2000);
+        }
+        
+        function addNewHabit() {
+            const title = document.getElementById('new-habit-title').value.trim();
+            const duration = parseInt(document.getElementById('new-habit-duration').value);
+            const type = document.getElementById('new-habit-type').value;
+
+            if (!title || isNaN(duration) || duration <= 0) {
+                alert('Veuillez remplir tous les champs correctement');
+                return;
+            }
+
+            if (type === 'daily') {
+                // Générer un ID unique (éviter les doublons)
+                let newId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+                let suffix = 1;
+                while (appData.habits.some(h => h.id === newId)) {
+                    newId = `${newId}-${suffix++}`;
+                }
+                appData.habits.push({
+                    id: newId,
+                    title: title,
+                    duration: duration,
+                    category: 'quotidien'
+                });
+            } else {
+                // Ajouter une session spécifique
+                const date = document.getElementById('new-session-date').value;
+                const description = document.getElementById('new-session-desc').value.trim();
+                if (!date) {
+                    alert('Veuillez sélectionner une date pour la session');
+                    return;
+                }
+                // Empêcher doublon même titre/date
+                if (appData.sessions.some(s => s.title === title && s.date === date)) {
+                    alert('Une session avec ce titre existe déjà pour cette date.');
+                    return;
+                }
+                appData.sessions.push({
+                    date: date,
+                    title: title,
+                    duration: duration,
+                    description: description
+                });
+            }
+
+            saveData();
+            updateUI();
+            resetAddHabitForm();
+        }
+        
+        function resetAddHabitForm() {
+            document.getElementById('new-habit-title').value = '';
+            document.getElementById('new-habit-duration').value = '15';
+            document.getElementById('new-habit-type').value = 'daily';
+            document.getElementById('new-session-date').value = formatDate(new Date());
+            document.getElementById('new-session-desc').value = '';
+            document.getElementById('session-date-group').style.display = 'none';
+            document.getElementById('session-desc-group').style.display = 'none';
+        }
+        
+        // --- Correction : updateStats doit exister sinon erreur lors du chargement ---
+        function updateStats() {
+            updateDayCounters();
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initData();
+            updateUI();
+
+            // Correction : gestion fiable des onglets
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    const tabId = this.dataset.tab;
+                    document.querySelectorAll('.tab-content').forEach(c => {
+                        if (c.id === tabId) c.classList.add('active');
+                    });
+                });
+            });
+
+            // Bouton pour enregistrer les notes
+            document.getElementById('save-notes').addEventListener('click', saveNotes);
+
+            // Correction navigation jours
+            document.getElementById('prev-day').addEventListener('click', function() {
+                navigateToPrevDay();
+            });
+            document.getElementById('next-day').addEventListener('click', function() {
+                navigateToNextDay();
+            });
+
+            // Gestion du formulaire d'ajout d'habitude
+            document.getElementById('new-habit-type').addEventListener('change', function() {
+                const showSessionFields = this.value === 'session';
+                document.getElementById('session-date-group').style.display = showSessionFields ? 'block' : 'none';
+                document.getElementById('session-desc-group').style.display = showSessionFields ? 'block' : 'none';
+            });
+
+            document.getElementById('save-new-habit').addEventListener('click', addNewHabit);
+            document.getElementById('cancel-add-habit').addEventListener('click', function() {
+                resetAddHabitForm();
+            });
+
+            // Définir la date par défaut pour les nouvelles sessions à aujourd'hui
+            const today = new Date();
+            const todayStr = formatDate(today);
+            document.getElementById('new-session-date').value = todayStr;
+
+            // Ajout du bouton reset (remet tout à zéro après confirmation)
+            document.getElementById('reset-all-btn').addEventListener('click', function() {
+                if (confirm('Voulez-vous vraiment réinitialiser toutes les données ?')) {
+                    localStorage.removeItem('habitTrackerData');
+                    location.reload();
+                }
+            });
+        });
+    </script>
+    
+</body>
+</html>
